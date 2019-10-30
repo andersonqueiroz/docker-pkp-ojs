@@ -24,7 +24,7 @@ RUN find . | grep .git | xargs rm -rf
 COPY files/* /app/
 
 FROM php:7.3-apache
-ENV APP_DIR=/var/www/html
+ENV APP_DIR=/var/www/html/ojstreinamento
 COPY --from=BUILD_NODE --chown=www-data:www-data /app/ ${APP_DIR}
 RUN mv ${APP_DIR}/config-creator.php /bin/config-creator \
  && mv ${APP_DIR}/pkp.sh /bin/pkp \
@@ -34,7 +34,10 @@ RUN mv ${APP_DIR}/config-creator.php /bin/config-creator \
  && chmod +x /bin/pkp \
  && chmod +x /entrypoint.sh \
  && docker-php-ext-install mysqli \
- && echo "error_log=/dev/stderr" > $PHP_INI_DIR/conf.d/error.ini
+ && echo "error_log=/dev/stderr" > $PHP_INI_DIR/conf.d/error.ini \
+ && mkdir /ojs_data \
+ && chmod -R 775 /ojs_data \ 
+ && chown -R www-data:www-data /ojs_data
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD [ "apache2ctl", "-DFOREGROUND" ]

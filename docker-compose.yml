@@ -4,32 +4,38 @@ services:
     build:
       context: .
       args:
-        tag_name: "ojs-3_1_1-4"
+        tag_name: "stable-3_1_2"
         repo_url: "https://github.com/pkp/ojs.git"
     ports: 
       - 8181:80
     environment: 
-      - PKP_GENERAL_INSTALLED=Off
+      - PKP_GENERAL_INSTALLED=On
       - PKP_DATABASE_DRIVER=mysqli
       - PKP_DATABASE_HOST=mysql
       - PKP_DATABASE_USERNAME=ojs
       - PKP_DATABASE_PASSWORD=ojs
       - PKP_DATABASE_NAME=ojs
+      - PKP_GENERAL_BASE_URL=http://bczm.ufrn.br/ojstreinamento
+      - PKP_FILES_FILES_DIR=/ojs_data
+    volumes:
+      - ojs_data:/ojs_data
+      - ojs_public_data:/var/www/html/ojstreinamento/public
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
   mysql:
     image: mysql:5.7
     volumes:
-      - db_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     environment: 
       - MYSQL_DATABASE=ojs
       - MYSQL_USER=ojs
       - MYSQL_PASSWORD=ojs
       - MYSQL_ROOT_PASSWORD=root
-  pma:
-    image: phpmyadmin/phpmyadmin:4.8
-    ports: 
-      - 8182:80
-    environment: 
-      - PMA_HOST=mysql
 
-volumes: 
-  db_data:
+volumes:
+  mysql_data:
+  ojs_data:
+  ojs_public_data:
